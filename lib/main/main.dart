@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/dialog.dart';
+import 'package:untitled/main/add_list_dialog_content.dart';
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -31,45 +32,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _onClickShowDialog() {
     Dialog dialog = new MyDialog(
-        child: new Center(
-          child: new Column(
-            children: <Widget>[
-              new Text('Add List'),
-              new TextField(
-                controller: addListController,
-                decoration: new InputDecoration.collapsed(
-                    hintText: 'Add what you want here fam'),
-                maxLines: 3,
-                onSubmitted: (String text) {
-                  Navigator.pop(context, {'value': text});
-                },
-              ),
-              new Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  new FlatButton(
-                      onPressed: () {
-                        Navigator.pop(
-                            context, {'value': addListController.text});
-                      }, child: new Text('add')),
-                  new FlatButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      }, child: new Text('delete')),
-                ],
-              )
-            ],
-          ),
+        child: new AddListDialogContent(
+            addListController: addListController
         )
     );
 
     showDialog(context: context, child: dialog)
         .then((onValue) {
-      if (onValue == null) {
+      if ((onValue as String).length <= 0) {
         return;
       }
 
-      textLists.add(onValue['value']);
+      print(onValue);
+      textLists.add(onValue);
       textCheckBoxes.add(false);
       addListController.clear();
       setState(() {});
