@@ -2,10 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/dialog.dart';
 import 'package:untitled/main/add_list_dialog_content.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:untitled/main/todo_model.dart';
+
+final mainReference = FirebaseDatabase.instance.reference();
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
@@ -30,6 +39,16 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> textLists = [];
   List<bool> textCheckBoxes = [];
 
+  _MyHomePageState() {
+    mainReference.onChildAdded.listen(_onEntryAdded);
+  }
+
+  _onEntryAdded(Event event) {
+    textLists.add(event.snapshot.value['todo']);
+    textCheckBoxes.add(false);
+    setState(() {});
+  }
+
   _onClickShowDialog() {
     Dialog dialog = new MyDialog(
         child: new AddListDialogContent(
@@ -39,13 +58,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
     showDialog(context: context, builder: (context) =>dialog)
         .then((onValue) {
-      if ((onValue as String).length <= 0) {
+      if (onValue == null || (onValue as String).length <= 0) {
+        addListController.clear();
         return;
       }
 
+      var now = new DateTime.now().toIso8601String();
+      print(now);
+
+      var mTodo = new TodoModel(now, onValue);
+      mainReference.push().set(mTodo.toJson());
+
       print(onValue);
-      textLists.add(onValue);
-      textCheckBoxes.add(false);
       addListController.clear();
       setState(() {});
     });
@@ -64,17 +88,17 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-        actions: <Widget>[
-          new IconButton(
-              icon: new Icon(Icons.add),
-              onPressed: _onClickShowDialog),
-          new IconButton(
-              icon: new Icon(Icons.remove),
-              onPressed: deleteRows),
-        ],
-      ),
+        appBar: new AppBar(
+          title: new Text(widget.title),
+          actions: <Widget>[
+            new IconButton(
+                icon: new Icon(Icons.add),
+                onPressed: _onClickShowDialog),
+            new IconButton(
+                icon: new Icon(Icons.remove),
+                onPressed: deleteRows),
+          ],
+        ),
         body: new Column(
           children: <Widget>[
             new Flexible(
