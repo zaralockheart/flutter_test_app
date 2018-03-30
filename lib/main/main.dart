@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
         )
     );
 
-    showDialog(context: context, child: dialog)
+    showDialog(context: context, builder: (context) =>dialog)
         .then((onValue) {
       if ((onValue as String).length <= 0) {
         return;
