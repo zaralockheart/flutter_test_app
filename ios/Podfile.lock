@@ -1,4 +1,6 @@
 PODS:
+  - device_info (0.0.1):
+    - Flutter
   - Firebase/Auth (4.11.0):
     - Firebase/Core
     - FirebaseAuth (= 4.5.0)
@@ -82,6 +84,7 @@ PODS:
   - nanopb/encode (0.3.8)
 
 DEPENDENCIES:
+  - device_info (from `Pods/.symlinks/plugins/device_info-0.2.0/ios`)
   - firebase_analytics (from `Pods/.symlinks/plugins/firebase_analytics-0.3.0/ios`)
   - firebase_auth (from `Pods/.symlinks/plugins/firebase_auth-0.5.3/ios`)
   - firebase_core (from `Pods/.symlinks/plugins/firebase_core-0.0.7/ios`)
@@ -91,6 +94,8 @@ DEPENDENCIES:
   - google_sign_in (from `Pods/.symlinks/plugins/google_sign_in-3.0.0/ios`)
 
 EXTERNAL SOURCES:
+  device_info:
+    :path: Pods/.symlinks/plugins/device_info-0.2.0/ios
   firebase_analytics:
     :path: Pods/.symlinks/plugins/firebase_analytics-0.3.0/ios
   firebase_auth:
@@ -107,6 +112,7 @@ EXTERNAL SOURCES:
     :path: Pods/.symlinks/plugins/google_sign_in-3.0.0/ios
 
 SPEC CHECKSUMS:
+  device_info: 76ce0b32e13034d1883be4a382433648f9dcee63
   Firebase: cc13dfab1038c8b45d7903e01fc690451d6d0b24
   firebase_analytics: ad15e54404e21983408c8b0c24a9d11247be7f33
   firebase_auth: 499d5bfb249606a276f6bddf292a3b2d44139f75

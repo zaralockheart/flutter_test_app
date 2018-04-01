@@ -1,20 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:untitled/common/dialog.dart';
-import 'package:untitled/main/add_list_dialog_content.dart';
+import 'dart:async';
+import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:device_info/device_info.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:untitled/common/dialog.dart';
+import 'package:untitled/common/utils.dart';
+import 'package:untitled/main/add_list_dialog_content.dart';
 import 'package:untitled/main/todo_model.dart';
-
-final mainReference = FirebaseDatabase.instance.reference();
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
@@ -34,18 +33,75 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var addListController = new TextEditingController();
 
-  List<String> textLists = [];
-  List<bool> textCheckBoxes = [];
+  String deviceData;
+
+  DatabaseReference mainReference;
+
+  var addListController = new TextEditingController();
+  static final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+
+  List<TodoModel> textCheckBoxes = new List();
+
+  var now = new DateTime.now().toIso8601String();
+
+  Future<Null> initPlatformState() async {
+    Map<String, dynamic> deviceData;
+
+    try {
+      if (Platform.isAndroid) {
+        deviceData = readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+      } else if (Platform.isIOS) {
+        deviceData = readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
+      }
+    } on PlatformException {
+      deviceData = <String, dynamic>{
+        'Error:': 'Failed to get platform version.'
+      };
+    }
+
+    if (!mounted) return;
+
+    mainReference = FirebaseDatabase.instance.reference().child(deviceData['identifierForVendor']);
+    mainReference.onChildAdded.listen(_onEntryAdded);
+    mainReference.onChildChanged.listen(_onEntryEdited);
+    mainReference.onChildRemoved.listen(_onChildRemoved);
+  }
 
   _MyHomePageState() {
-    mainReference.onChildAdded.listen(_onEntryAdded);
+    initPlatformState();
+  }
+
+  _onEntryEdited(Event event) {
+    var oldValue = textCheckBoxes.singleWhere((entry) =>
+    entry.key == event.snapshot.key);
+    setState(() {
+      textCheckBoxes[textCheckBoxes.indexOf(oldValue)] =
+      new TodoModel.fromSnapshot(event.snapshot);
+    });
+  }
+
+  int _indexForKey(String key) {
+    assert(key != null);
+    for (int index = 0; index < textCheckBoxes.length; index++) {
+      if (key == textCheckBoxes[index].key) {
+        return index;
+      }
+    }
+    return null;
+  }
+
+  _onChildRemoved(Event event) {
+    final int index = _indexForKey(event.snapshot.key);
+    textCheckBoxes.removeAt(index);
+
+    setState(() {});
   }
 
   _onEntryAdded(Event event) {
-    textLists.add(event.snapshot.value['todo']);
-    textCheckBoxes.add(false);
+    if (new TodoModel.fromSnapshot(event.snapshot) != null)
+      textCheckBoxes.add(new TodoModel.fromSnapshot(event.snapshot));
+
     setState(() {});
   }
 
@@ -63,63 +119,74 @@ class _MyHomePageState extends State<MyHomePage> {
         return;
       }
 
-      var now = new DateTime.now().toIso8601String();
-      print(now);
-
-      var mTodo = new TodoModel(now, onValue);
+      var mTodo = new TodoModel(now, onValue, false);
       mainReference.push().set(mTodo.toJson());
 
-      print(onValue);
       addListController.clear();
       setState(() {});
     });
   }
 
+  _pushEdit(TodoModel todoModel, newValue) {
+    mainReference.child(todoModel.key).set(newValue.toJson());
+    setState(() {});
+  }
+
+  deleteRows() {
+    for (var i = 0; i < textCheckBoxes.length; i++) {
+      if (textCheckBoxes[i].checked) {
+        _pushEdit(textCheckBoxes[i], new TodoModel(null, null, null));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    deleteRows() {
-      for (var i = 0; i < textLists.length; i++) {
-        if (textCheckBoxes[i]) {
-          textCheckBoxes.removeAt(i);
-          textLists.removeAt(i);
-        }
-      }
-      setState(() {});
-    }
-
     return new Scaffold(
-        appBar: new AppBar(
-          title: new Text(widget.title),
-          actions: <Widget>[
-            new IconButton(
-                icon: new Icon(Icons.add),
-                onPressed: _onClickShowDialog),
-            new IconButton(
-                icon: new Icon(Icons.remove),
-                onPressed: deleteRows),
-          ],
-        ),
-        body: new Column(
-          children: <Widget>[
-            new Flexible(
-                child: new ListView.builder(
-                    itemCount: textLists.length,
-                    itemBuilder: (context, index) {
-                      return new Row(
-                        children: <Widget>[
-                          new Checkbox(
-                              value: textCheckBoxes[index],
-                              onChanged: (bool newValue) {
-                                textCheckBoxes[index] = newValue;
-                                setState(() {});
-                              }),
-                          new Text(textLists[index]),
-                        ],
-                      );
-                    })
-            ),
-          ],
-        )
+      appBar: new AppBar(
+        title: new Text(widget.title),
+        actions: <Widget>[
+          new IconButton(
+              icon: new Icon(Icons.add),
+              onPressed: _onClickShowDialog),
+          new IconButton(
+              icon: new Icon(Icons.remove),
+              onPressed: deleteRows),
+        ],
+      ),
+      body: new Column(
+        children: <Widget>[
+          new Flexible(
+              child: new ListView.builder(
+                  itemCount: textCheckBoxes.length,
+                  itemBuilder: (context, index) {
+                    return new Row(
+                      children: <Widget>[
+                        new Checkbox(
+                            value: textCheckBoxes[index].checked != null
+                                && textCheckBoxes[index].checked,
+                            onChanged: (bool newValue) {
+                              _pushEdit(
+                                  textCheckBoxes[index],
+                                  new TodoModel(
+                                      textCheckBoxes[index].dateTime,
+                                      textCheckBoxes[index].todo,
+                                      newValue
+                                  )
+                              );
+                              setState(() {});
+                            }),
+                        new Text(
+                            textCheckBoxes[index].todo != null
+                                ? textCheckBoxes[index].todo
+                                : ''
+                        ),
+                      ],
+                    );
+                  })
+          ),
+        ],
+      ),
     );
   }
 }
