@@ -1,4 +1,6 @@
 PODS:
+  - device_info (0.0.1):
+    - Flutter
   - Firebase/Auth (4.11.0):
     - Firebase/Core
     - FirebaseAuth (= 4.5.0)
@@ -80,8 +82,11 @@ PODS:
     - nanopb/encode (= 0.3.8)
   - nanopb/decode (0.3.8)
   - nanopb/encode (0.3.8)
+  - shared_preferences (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
+  - device_info (from `Pods/.symlinks/plugins/device_info-0.2.0/ios`)
   - firebase_analytics (from `Pods/.symlinks/plugins/firebase_analytics-0.3.0/ios`)
   - firebase_auth (from `Pods/.symlinks/plugins/firebase_auth-0.5.3/ios`)
   - firebase_core (from `Pods/.symlinks/plugins/firebase_core-0.0.7/ios`)
@@ -89,8 +94,11 @@ DEPENDENCIES:
   - firebase_storage (from `Pods/.symlinks/plugins/firebase_storage-0.2.0/ios`)
   - Flutter (from `Pods/.symlinks/flutter/ios`)
   - google_sign_in (from `Pods/.symlinks/plugins/google_sign_in-3.0.0/ios`)
+  - shared_preferences (from `Pods/.symlinks/plugins/shared_preferences-0.4.0/ios`)
 
 EXTERNAL SOURCES:
+  device_info:
+    :path: Pods/.symlinks/plugins/device_info-0.2.0/ios
   firebase_analytics:
     :path: Pods/.symlinks/plugins/firebase_analytics-0.3.0/ios
   firebase_auth:
@@ -105,8 +113,11 @@ EXTERNAL SOURCES:
     :path: Pods/.symlinks/flutter/ios
   google_sign_in:
     :path: Pods/.symlinks/plugins/google_sign_in-3.0.0/ios
+  shared_preferences:
+    :path: Pods/.symlinks/plugins/shared_preferences-0.4.0/ios
 
 SPEC CHECKSUMS:
+  device_info: 76ce0b32e13034d1883be4a382433648f9dcee63
   Firebase: cc13dfab1038c8b45d7903e01fc690451d6d0b24
   firebase_analytics: ad15e54404e21983408c8b0c24a9d11247be7f33
   firebase_auth: 499d5bfb249606a276f6bddf292a3b2d44139f75
@@ -127,6 +138,7 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 390ea358e5a0d0133153806f744662dad933d06b
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
+  shared_preferences: 5a1d487c427ee18fcd3ea1f2a131569481834b53
 
 PODFILE CHECKSUM: 70e69985f01fdaffe3180d3ae5e73472304a9371
 
