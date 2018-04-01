@@ -9,6 +9,7 @@ import 'package:untitled/common/dialog.dart';
 import 'package:untitled/common/utils.dart';
 import 'package:untitled/main/add_list_dialog_content.dart';
 import 'package:untitled/main/todo_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -34,16 +35,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  String deviceData;
-
   DatabaseReference mainReference;
 
   var addListController = new TextEditingController();
+
   static final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   List<TodoModel> textCheckBoxes = new List();
 
-  var now = new DateTime.now().toIso8601String();
+  String now = new DateTime.now().toIso8601String();
+
+  _MyHomePageState() {
+    initPlatformState();
+  }
 
   Future<Null> initPlatformState() async {
     Map<String, dynamic> deviceData;
@@ -62,14 +68,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (!mounted) return;
 
-    mainReference = FirebaseDatabase.instance.reference().child(deviceData['identifierForVendor']);
+    storeDateAndInitFirebase(deviceData);
+  }
+
+  storeDateAndInitFirebase(deviceData) async{
+    final SharedPreferences prefs = await _prefs;
+
+    if(deviceData['identifierForVendor'] != '') {
+      setState(() {
+        prefs.setString('device', deviceData['identifierForVendor']);
+      });
+    }
+
+    mainReference = FirebaseDatabase.instance.reference().child(prefs.getString('device'));
     mainReference.onChildAdded.listen(_onEntryAdded);
     mainReference.onChildChanged.listen(_onEntryEdited);
     mainReference.onChildRemoved.listen(_onChildRemoved);
-  }
-
-  _MyHomePageState() {
-    initPlatformState();
   }
 
   _onEntryEdited(Event event) {

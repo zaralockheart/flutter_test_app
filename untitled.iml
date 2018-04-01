@@ -6,6 +6,12 @@
       <excludeFolder url="file://$MODULE_DIR$/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/Pods/.symlinks/plugins/device_info-0.2.0/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/Pods/.symlinks/plugins/device_info-0.2.0/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/Pods/.symlinks/plugins/device_info-0.2.0/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/Pods/.symlinks/plugins/device_info-0.2.0/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/Pods/.symlinks/plugins/device_info-0.2.0/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/Pods/.symlinks/plugins/device_info-0.2.0/example/build" />
       <excludeFolder url="file://$MODULE_DIR$/ios/Pods/.symlinks/plugins/firebase_analytics-0.0.4/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/ios/Pods/.symlinks/plugins/firebase_analytics-0.0.4/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/ios/Pods/.symlinks/plugins/firebase_analytics-0.0.4/build" />
