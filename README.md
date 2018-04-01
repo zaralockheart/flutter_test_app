@@ -15,6 +15,8 @@ eg `~/untitled/lib/settings/main_dev.dart`
 7. Click "Apply" and "Ok"
 8. Change your environment build form `main.dart` to your environment and have fun  :)
 
+Blog about separating environment [thanks Flutter Rocks!](https://flutter.rocks/2018/03/02/separating-build-environments-part-one/)
+
 **Build APK**
 
 run flutter build (apk/ios) `lib/main_prod.dart`
